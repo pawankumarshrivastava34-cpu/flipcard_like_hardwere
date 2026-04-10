@@ -1,32 +1,39 @@
 let cart = [];
 
-// 🔄 LOADER
+// 🔄 LOADER SAFE FIX
 window.onload = function () {
+
     let loader = document.getElementById("loader");
 
-    setTimeout(() => {
-        loader.style.display = "none";
-    }, 1000);
+    if (loader) {
+        setTimeout(() => {
+            loader.style.opacity = "0";
+            loader.style.transition = "0.4s ease";
+
+            setTimeout(() => {
+                loader.style.display = "none";
+            }, 400);
+        }, 600);
+    }
 
     cart = JSON.parse(localStorage.getItem("cart")) || [];
     updateCartUI();
 };
 
 // ➕ ADD TO CART
-function addToCart(name, price, qtyId) {
+function addToCart(name, price, qtyId, btn) {
 
-    let qtyInput = document.getElementById(qtyId).value;
-    let qty = Number(qtyInput);
+    let qtyInput = document.getElementById(qtyId);
+    let qty = Number(qtyInput ? qtyInput.value : 1);
 
-    // ❌ HARD VALIDATION
     if (!Number.isFinite(qty) || qty < 1) {
-        showToast("❌ Quantity must be 1 or more", "error");
+        showToast("❌ Invalid quantity", "error");
         return;
     }
 
-    qty = Math.floor(qty); // remove decimals
+    qty = Math.floor(qty);
 
-    let existing = cart.find(item => item.name === name);
+    let existing = cart.find(i => i.name === name);
 
     if (existing) {
         existing.qty += qty;
@@ -37,47 +44,64 @@ function addToCart(name, price, qtyId) {
     saveCart();
     updateCartUI();
 
-    showToast(`✅ ${name} added`, "success");
+    showToast("✅ " + name + " added", "success");
+    showCenterMsg("🛒 Added!");
+
+    if (btn) flyToCart(btn);
 }
 
-// ❌ REMOVE ITEM
+// ❌ REMOVE ITEM (FIX EMPTY CART BUG)
 function removeItem(index) {
-    let removedItem = cart[index].name;
+
+    let name = cart[index].name;
 
     cart.splice(index, 1);
+
     saveCart();
     updateCartUI();
 
-    showToast(`⚠️ ${removedItem} removed`, "warning");
+    showToast("⚠️ Removed " + name, "warning");
+    showCenterMsg("🗑️ Removed!");
+
+    if (cart.length === 0) {
+        setTimeout(() => {
+            showToast("🛒 Cart Empty", "error");
+            showCenterMsg("Cart Empty!");
+        }, 300);
+    }
 }
 
-// 🔄 UPDATE UI
+// 🔄 CART UPDATE
 function updateCartUI() {
+
     let list = document.getElementById("cart-list");
+    if (!list) return;
+
     list.innerHTML = "";
 
     let total = 0;
-    let totalQty = 0;
+    let count = 0;
 
-    cart.forEach((item, index) => {
+    cart.forEach((item, i) => {
+
         let li = document.createElement("li");
 
         li.innerHTML = `
-        ${item.name} x ${item.qty} = ₹${item.price * item.qty}
-        <button class="remove" onclick="removeItem(${index})">❌</button>
+            ${item.name} x ${item.qty} = ₹${item.price * item.qty}
+            <button onclick="removeItem(${i})">❌</button>
         `;
 
         list.appendChild(li);
 
         total += item.price * item.qty;
-        totalQty += item.qty;
+        count += item.qty;
     });
 
-    document.getElementById("cart-count").innerText = totalQty;
+    document.getElementById("cart-count").innerText = count;
     document.getElementById("total").innerText = "Total: ₹" + total;
 }
 
-// 💾 SAVE
+// 💾 SAVE CART
 function saveCart() {
     localStorage.setItem("cart", JSON.stringify(cart));
 }
@@ -85,83 +109,120 @@ function saveCart() {
 // 💳 CHECKOUT
 function checkout() {
     if (cart.length === 0) {
-        showToast("❌ Cart empty!", "error");
+        showToast("❌ Cart Empty", "error");
+        showCenterMsg("Cart Empty!");
         return;
     }
     window.location = "checkout.html";
 }
 
 // 🔔 TOAST
-function showToast(message, type) {
-    let toast = document.getElementById("toast");
+function showToast(msg, type) {
 
-    toast.innerText = message;
+    let toast = document.getElementById("toast");
+    if (!toast) return;
+
+    toast.innerText = msg;
     toast.className = "show toast-" + type;
 
     setTimeout(() => {
-        toast.className = toast.className.replace("show", "");
-    }, 2500);
+        toast.className = "";
+    }, 2000);
 }
 
-// 🔍 SEARCH FUNCTION
-document.getElementById("searchInput").addEventListener("keyup", function(){
+// 🟢 CENTER MESSAGE
+function showCenterMsg(text) {
 
-    let value = this.value.toLowerCase();
-    let cards = document.querySelectorAll(".card");
+    let box = document.getElementById("centerMsg");
+    if (!box) return;
 
-    cards.forEach(card => {
-        let text = card.innerText.toLowerCase();
+    box.innerText = text;
+    box.style.display = "block";
 
-        if(text.includes(value)){
-            card.style.display = "block";
-        } else {
-            card.style.display = "none";
-        }
-    });
+    setTimeout(() => {
+        box.style.display = "none";
+    }, 1200);
+}
 
+// 🔍 SEARCH
+document.addEventListener("DOMContentLoaded", () => {
+
+    let search = document.getElementById("searchInput");
+
+    if (search) {
+        search.addEventListener("keyup", function () {
+
+            let value = this.value.toLowerCase();
+
+            document.querySelectorAll(".card").forEach(card => {
+                let text = card.innerText.toLowerCase();
+                card.style.display = text.includes(value) ? "" : "none";
+            });
+        });
+    }
 });
 
-// voice
-
+// 🎤 VOICE SEARCH
 function startVoiceSearch() {
 
     let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-
     recognition.lang = "en-IN";
     recognition.start();
 
-    recognition.onresult = function(event) {
-
-        let text = event.results[0][0].transcript;
-        document.getElementById("searchInput").value = text;
-
-        filterProducts(text);
-    };
-
-    recognition.onerror = function() {
-        alert("Voice not supported or permission denied");
+    recognition.onresult = function (event) {
+        document.getElementById("searchInput").value =
+            event.results[0][0].transcript;
     };
 }
 
-function filterProducts(value){
+// ⭐ RATING FIX SAFE
+document.addEventListener("DOMContentLoaded", () => {
 
-    value = value.toLowerCase();
-    let cards = document.querySelectorAll(".card");
+    document.querySelectorAll(".rating").forEach(rating => {
 
-    cards.forEach(card => {
+        let product = rating.dataset.product;
+        let saved = localStorage.getItem("rating_" + product) || 0;
 
-        let text = card.innerText.toLowerCase();
+        for (let i = 1; i <= 5; i++) {
 
-        if(text.includes(value)){
-            card.style.display = "";
-        }else{
-            card.style.display = "none";
+            let star = document.createElement("span");
+            star.innerHTML = "★";
+
+            if (i <= saved) star.classList.add("active");
+
+            star.addEventListener("click", () => {
+                localStorage.setItem("rating_" + product, i);
+                location.reload();
+            });
+
+            rating.appendChild(star);
         }
-
     });
-}
-
-// typing search connect
-document.getElementById("searchInput").addEventListener("keyup", function(){
-    filterProducts(this.value);
 });
+
+// ✨ FLY ANIMATION
+function flyToCart(btn) {
+
+    let cartIcon = document.querySelector(".cart");
+    let fly = document.getElementById("flyCart");
+
+    if (!cartIcon || !fly) return;
+
+    let r1 = btn.getBoundingClientRect();
+    let r2 = cartIcon.getBoundingClientRect();
+
+    fly.style.display = "block";
+    fly.style.left = r1.left + "px";
+    fly.style.top = r1.top + "px";
+
+    setTimeout(() => {
+        fly.style.left = r2.left + "px";
+        fly.style.top = r2.top + "px";
+        fly.style.opacity = "0";
+    }, 50);
+
+    setTimeout(() => {
+        fly.style.display = "none";
+        fly.style.opacity = "1";
+    }, 800);
+}
