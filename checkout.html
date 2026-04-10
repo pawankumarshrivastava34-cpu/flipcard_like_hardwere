@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Checkout</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI';
+    background: linear-gradient(135deg,#0f172a,#020617);
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    padding:30px;
+    border-radius:20px;
+    width:350px;
+    box-shadow:0 0 40px rgba(0,255,204,0.2);
+    text-align:center;
+}
+
+input,textarea{
+    width:100%;
+    padding:12px;
+    margin:8px 0;
+    border-radius:10px;
+    border:none;
+    background:#0f172a;
+    color:white;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.whatsapp{ background:#25D366; }
+.pay{ background:#00ffcc; color:black; }
+
+.qr-box{ display:none; margin-top:20px; }
+.qr-box img{ width:200px; }
+
+.status{ display:none; margin-top:15px; padding:10px; border-radius:10px; }
+.pending{ background:orange; color:black; }
+.success{ background:green; }
+
+.loader{
+    border:4px solid #111;
+    border-top:4px solid cyan;
+    border-radius:50%;
+    width:25px;
+    height:25px;
+    animation:spin 1s linear infinite;
+    margin:auto;
+    display:none;
+}
+
+@keyframes spin{
+    100%{transform:rotate(360deg);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🧾 Checkout</h2>
+
+<input id="name" placeholder="Full Name">
+<input id="phone" placeholder="Mobile Number">
+<textarea id="address" placeholder="Address"></textarea>
+
+<button class="whatsapp" onclick="sendOrder()">📲 Order via WhatsApp</button>
+<button class="pay" onclick="payNow()">💰 Pay Now</button>
+
+<div class="qr-box" id="qrBox">
+    <h3>Scan & Pay</h3>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9798430679-2@ybl&pn=HardwareShop">
+    <p>UPI: 9798430679-2@ybl</p>
+</div>
+
+<div class="loader" id="loader"></div>
+<div class="status pending" id="statusBox"></div>
+
+</div>
+
+<script>
+
+// 📲 ORDER
+function sendOrder(){
+
+    let name = nameVal();
+    let phone = phoneVal();
+    let address = addressVal();
+
+    if(!validate(name,phone,address)) return;
+
+    let cart = getCart();
+    if(cart.length===0){ alert("Cart empty"); return; }
+
+    let total = 0;
+    let msg = "🧾 Order%0A";
+
+    msg += "Name: "+name+"%0A";
+    msg += "Phone: "+phone+"%0A";
+    msg += "Address: "+address+"%0A";
+
+    cart.forEach(item=>{
+        msg += item.name + " x " + item.qty + " = ₹" + (item.price * item.qty) + "%0A";
+        total += item.price * item.qty;
+    });
+
+    msg += "Total: ₹"+total+"%0A";
+
+    // ✅ IMPORTANT LINE
+    msg += "Payment: ⏳ Pending";
+
+    window.open("https://wa.me/917667251048?text="+msg);
+}
+
+// 💰 PAYMENT
+function payNow(){
+
+let name = nameVal();
+let phone = phoneVal();
+let address = addressVal();
+
+if(!validate(name,phone,address)) return;
+
+let cart = getCart();
+if(cart.length===0){ alert("Cart empty"); return; }
+
+showUI();
+
+setTimeout(()=>{
+
+hideLoader();
+
+let success = Math.random()>0.3;
+
+let total=0;
+cart.forEach(i=> total+=i.price*i.qty);
+
+if(success){
+    showSuccess();
+    localStorage.removeItem("cart");
+    showBtn("success");
+}else{
+    showPending();
+    showBtn("pending");
+}
+
+},4000);
+}
+
+// 🧠 HELPERS
+
+function nameVal(){ return document.getElementById("name").value.trim(); }
+function phoneVal(){ return document.getElementById("phone").value.trim(); }
+function addressVal(){ return document.getElementById("address").value.trim(); }
+
+function getCart(){
+return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function validate(n,p,a){
+if(n==""||p==""||a==""){ alert("Fill all details"); return false;}
+if(p.length!=10||isNaN(p)){ alert("Invalid phone"); return false;}
+return true;
+}
+
+function showUI(){
+document.getElementById("qrBox").style.display="block";
+document.getElementById("statusBox").style.display="block";
+document.getElementById("loader").style.display="block";
+}
+
+function hideLoader(){
+document.getElementById("loader").style.display="none";
+}
+
+function showSuccess(){
+let box=document.getElementById("statusBox");
+box.className="status success";
+box.innerHTML="✅ Payment Successful";
+}
+
+function showPending(){
+let box=document.getElementById("statusBox");
+box.className="status pending";
+box.innerHTML="⏳ Payment Pending";
+}
+
+// 📲 WhatsApp Button
+function showBtn(type){
+
+let box=document.getElementById("statusBox");
+
+box.innerHTML += `<br><button onclick="sendPaymentMsg('${type}')">Send WhatsApp</button>`;
+}
+
+function sendPaymentMsg(type){
+
+    let name = nameVal();
+    let phone = phoneVal();
+    let address = addressVal();
+
+    let cart = getCart();
+
+    let total = 0;
+    let msg = "🧾 Order Update%0A";
+
+    msg += "Name: "+name+"%0A";
+    msg += "Phone: "+phone+"%0A";
+    msg += "Address: "+address+"%0A";
+
+    cart.forEach(item=>{
+        msg += item.name + " x " + item.qty + " = ₹" + (item.price * item.qty) + "%0A";
+        total += item.price * item.qty;
+    });
+
+    msg += "Total: ₹"+total+"%0A";
+
+    // ✅ Payment status add
+    if(type === "success"){
+        msg += "Payment: ✅ Successful";
+    }else{
+        msg += "Payment: ⏳ Pending";
+    }
+
+    window.open("https://wa.me/919798430679?text="+msg);
+}
+</script>
+
+</body>
+</html>

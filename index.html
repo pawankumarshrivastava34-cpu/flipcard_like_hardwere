@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hardware_shop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div id="loader"><div class="spinner"></div></div>
+
+<header>
+    <h1 class="logo">🔧 Nawal Shrivastav Hardware Shop</h1>
+
+    <!-- 🔍 SEARCH -->
+    <div class="search-box">
+        <i class="fa fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search product...">
+
+        <i class="fa fa-microphone mic-icon" onclick="startVoiceSearch()"></i>
+
+    </div>
+
+    <nav class="nav">
+        <a href="#">Home</a>
+        <a href="#products">Products</a>
+        <a href="#footer">Contact</a>
+    </nav>
+
+    <div class="cart">🛒 <span id="cart-count">0</span></div>
+</header>
+
+<section class="hero">
+    <div class="hero-content">
+        <img src="brother.jpeg" class="owner-img">
+        <div>
+            <h2>Best Hardware Shop 🛠️</h2>
+            <p>Tanki | Pipe | Nal | Fittings</p>
+            <h3>Owner: Mr. Nawal Kishor Shrivastava</h3>
+        </div>
+    </div>
+</section>
+
+<h2 id="products">Our Products</h2>
+
+<div class="products">
+
+<!-- 15 PRODUCTS -->
+
+<div class="card">
+<img src="https://mahavirgroup.org/wp-content/uploads/2023/11/yellow-tank-2.webp">
+<h3>Tank</h3><p>₹1500</p>
+<input id="q1" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Tank',1500,'q1')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://images.jdmagicbox.com/quickquotes/images_main/-782mtl1c.png">
+<h3>Pipe</h3><p>₹300</p>
+<input id="q2" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Pipe',300,'q2')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://cedarclink.com/wp-content/uploads/2021/07/pillar-basin-tap-@850.jpg">
+<h3>Tap</h3><p>₹200</p>
+<input id="q3" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Tap',200,'q3')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://www.inart.co.in/cdn/shop/files/81jjRBMJoDL._AC_SL1500.jpg">
+<h3>Shower</h3><p>₹500</p>
+<input id="q4" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Shower',500,'q4')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://www.plantex.in/cdn/shop/files/41X1o-ggsCL.jpg">
+<h3>Valve</h3><p>₹250</p>
+<input id="q5" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Valve',250,'q5')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://shop.jains.com/cdn/shop/files/90Elbow.png">
+<h3>Elbow</h3><p>₹100</p>
+<input id="q6" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Elbow',100,'q6')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://thumbs.dreamstime.com/b/white-pvc-joint-black-background-set-plastic-fittings-electric-pipeline-black-background-223360696.jpg">
+<h3>T Joint</h3><p>₹120</p>
+<input id="q7" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('T Joint',120,'q7')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://rukminim2.flixcart.com/image/480/480/xif0q/water-pump/k/g/q/texma-super-water-motor-pump.jpeg">
+<h3>Motor</h3><p>₹3000</p>
+<input id="q8" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Motor',3000,'q8')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://www.rakshapipes.com/images/gallery/CPVC.png">
+<h3>CPVC Pipe</h3><p>₹800</p>
+<input id="q9" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('CPVC',800,'q9')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://highgripindustries.in/wp-content/uploads/2023/02/PVC-Clamps-1.jpg">
+<h3>Clamp</h3><p>₹50</p>
+<input id="q10" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Clamp',50,'q10')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://m.media-amazon.com/images/I/61u7vF4cFEL.jpg">
+<h3>Drum</h3><p>₹900</p>
+<input id="q11" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Drum',900,'q11')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://m.media-amazon.com/images/I/71V3d3k3dKL.jpg">
+<h3>Cutter</h3><p>₹350</p>
+<input id="q12" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Cutter',350,'q12')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://m.media-amazon.com/images/I/61LtuGzXeaL.jpg">
+<h3>Switch</h3><p>₹450</p>
+<input id="q13" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Switch',450,'q13')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://m.media-amazon.com/images/I/61l9ppRIiqL.jpg">
+<h3>Steel Pipe</h3><p>₹700</p>
+<input id="q14" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Steel Pipe',700,'q14')">Add</button>
+</div>
+
+<div class="card">
+<img src="https://m.media-amazon.com/images/I/71S4b3z5y2L.jpg">
+<h3>Filter</h3><p>₹1200</p>
+<input id="q15" type="number" value="1" min="1" step="1" onkeydown="return event.key !== '-'">
+<button onclick="addToCart('Filter',1200,'q15')">Add</button>
+</div>
+
+</div>
+
+<h2>Your Cart</h2>
+<ul id="cart-list"></ul>
+<h3 id="total">Total: ₹0</h3>
+
+<button class="checkout-btn" onclick="checkout()">Checkout</button>
+
+
+<footer id="footer">
+    <h3>📍 Contact Us</h3>
+    <p>Gopalganj, Bihar</p>
+    <p>Phone: 917667251048</p>
+    <p>Email: nawalkumar470@gmail.com</p>
+
+  <!-- 🔗 Social Media -->
+    <div class="social-links">
+        <a href="https://www.instagram.com/nawalkumarshriwastav?igsh=MW5vOGk3cWd2cHJwMA==" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.facebook.com/share/1DVH7pjMHd/" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+    </div>
+
+</footer>
+<div id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
